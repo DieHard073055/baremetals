@@ -138,6 +138,7 @@ async def _create_allocated_withdrawal(
 
     # Validate each bar: must belong to account and not already withdrawn
     already_withdrawn_subq = select(WithdrawalBar.bar_id)
+    first_metal = None
 
     for bar_id in body.bar_ids:
         bar_result = await db.execute(
@@ -164,6 +165,9 @@ async def _create_allocated_withdrawal(
                 detail=f"Bar {bar_id} does not belong to account {body.account_id}",
             )
 
+        if first_metal is None:
+            first_metal = deposit.metal
+
         # Check not already withdrawn
         withdrawn_result = await db.execute(
             select(WithdrawalBar).where(WithdrawalBar.bar_id == bar_id)
@@ -178,7 +182,7 @@ async def _create_allocated_withdrawal(
         withdrawal_number=f"WDR-{uuid.uuid4().hex[:12].upper()}",
         account_id=body.account_id,
         vault_id=None,
-        metal=None,
+        metal=first_metal,
         storage_type=StorageType.allocated,
         token_amount=None,
         created_by=current_user.id,
