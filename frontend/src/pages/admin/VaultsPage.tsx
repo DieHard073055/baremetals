@@ -38,14 +38,18 @@ function VaultMap({ vaults, onVaultClick, onMapClick }: {
     if (!mapRef.current || mapInstanceRef.current) return
     // Centre on Malé at street level
     const map = L.map(mapRef.current).setView([4.1755, 73.5093], 12)
-    // CartoDB Dark Matter — matches navy brand theme, English labels
+    // Esri World Dark Gray Canvas — free, no API key, global coverage
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png',
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
       {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+        maxZoom: 16,
       }
+    ).addTo(map)
+    // Esri reference layer adds labels on top
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom: 16, pane: 'shadowPane' }
     ).addTo(map)
     map.on('click', (e) => onMapClick(e.latlng.lat, e.latlng.lng))
     mapInstanceRef.current = map
