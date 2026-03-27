@@ -42,26 +42,26 @@
 - [x] 4.7 `PATCH /vaults/{id}/deactivate` — deactivate; block if active holdings exist
 
 ## 5. Deposits
-- [ ] 5.1 Write tests: unallocated deposit increments pool and balance, token_amount ≤ 0 → 422, institutional on unallocated → 422
-- [ ] 5.2 Write tests: allocated deposit inserts bars, duplicate serial → 409, retail on allocated → 422
-- [ ] 5.3 Write tests: deposit detail includes bars for allocated type
-- [ ] 5.4 Define `Deposit`, `AllocatedBar` models and schemas
-- [ ] 5.5 Validate storage_type vs account_type at service layer
-- [ ] 5.6 Implement unallocated deposit: increment `unallocated_pools` and `token_balances` atomically
-- [ ] 5.7 Implement allocated deposit: insert bars with unique serial constraint (HTTP 409 on conflict)
-- [ ] 5.8 `POST /deposits` — dispatch to correct handler (ops only)
-- [ ] 5.9 `GET /deposits` — list all deposits (admin/ops)
-- [ ] 5.10 `GET /deposits/{id}` — deposit detail including bars if allocated
+- [x] 5.1 Write tests: unallocated deposit increments pool and balance, token_amount ≤ 0 → 422, institutional on unallocated → 422
+- [x] 5.2 Write tests: allocated deposit inserts bars, duplicate serial → 409, retail on allocated → 422
+- [x] 5.3 Write tests: deposit detail includes bars for allocated type
+- [x] 5.4 Define `Deposit`, `AllocatedBar` models and schemas
+- [x] 5.5 Validate storage_type vs account_type at service layer
+- [x] 5.6 Implement unallocated deposit: increment `unallocated_pools` and `token_balances` atomically
+- [x] 5.7 Implement allocated deposit: insert bars with unique serial constraint (HTTP 409 on conflict)
+- [x] 5.8 `POST /deposits` — dispatch to correct handler (ops only)
+- [x] 5.9 `GET /deposits` — list all deposits (admin/ops)
+- [x] 5.10 `GET /deposits/{id}` — deposit detail including bars if allocated
 
 ## 6. Withdrawals
-- [ ] 6.1 Write tests: unallocated withdrawal decrements pool and balance, insufficient balance → 422, insufficient pool → 422
+- [x] 6.1 Write tests: unallocated withdrawal decrements pool and balance, insufficient balance → 422, insufficient pool → 422
 - [ ] 6.2 Write tests: concurrent unallocated withdrawals — only one succeeds when pool would be overdrawn
-- [ ] 6.3 Write tests: allocated withdrawal marks bars as withdrawn, bar belongs to wrong account → 422, already-withdrawn bar → 422
-- [ ] 6.4 Define `Withdrawal`, `WithdrawalBar` models and schemas
-- [ ] 6.5 Implement unallocated withdrawal: `SELECT ... FOR UPDATE` on pool row, validate pool + balance, decrement both atomically
-- [ ] 6.6 Implement allocated withdrawal: validate bars belong to account and are not already withdrawn, mark bars as withdrawn
-- [ ] 6.7 `POST /withdrawals` — dispatch to correct handler (ops only)
-- [ ] 6.8 `GET /withdrawals` — list all withdrawals (admin/ops)
+- [x] 6.3 Write tests: allocated withdrawal marks bars as withdrawn, bar belongs to wrong account → 422, already-withdrawn bar → 422
+- [x] 6.4 Define `Withdrawal`, `WithdrawalBar` models and schemas
+- [x] 6.5 Implement unallocated withdrawal: `SELECT ... FOR UPDATE` on pool row, validate pool + balance, decrement both atomically
+- [x] 6.6 Implement allocated withdrawal: validate bars belong to account and are not already withdrawn, mark bars as withdrawn
+- [x] 6.7 `POST /withdrawals` — dispatch to correct handler (ops only)
+- [x] 6.8 `GET /withdrawals` — list all withdrawals (admin/ops)
 
 ## 7. Portfolio
 - [ ] 7.1 Write tests: retail portfolio returns token balance in kg, institutional returns active bar list
