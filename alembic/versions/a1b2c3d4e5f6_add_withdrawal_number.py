@@ -18,19 +18,18 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Add with a server default so existing rows get a value,
-    # then drop the default so new rows must supply one explicitly.
+    # Step 1: add nullable so existing rows don't need a value yet
     op.add_column(
         'withdrawals',
-        sa.Column(
-            'withdrawal_number',
-            sa.String(50),
-            nullable=False,
-            server_default=sa.text("'WDR-' || lpad(id::text, 9, '0')"),
-        ),
+        sa.Column('withdrawal_number', sa.String(50), nullable=True),
     )
+    # Step 2: backfill existing rows with a unique placeholder
+    op.execute(
+        "UPDATE withdrawals SET withdrawal_number = 'WDR-' || lpad(id::text, 9, '0')"
+    )
+    # Step 3: enforce NOT NULL and uniqueness
+    op.alter_column('withdrawals', 'withdrawal_number', nullable=False)
     op.create_unique_constraint('uq_withdrawals_withdrawal_number', 'withdrawals', ['withdrawal_number'])
-    op.alter_column('withdrawals', 'withdrawal_number', server_default=None)
 
 
 def downgrade() -> None:
