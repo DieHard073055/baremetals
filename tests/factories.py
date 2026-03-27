@@ -1,15 +1,13 @@
 """
-factory-boy factories for all core models.
+Factories for test data.
 
-Usage in tests:
-    AccountFactory._meta.sqlalchemy_session = db_session
-    account = await AccountFactory.create(role=Role.ops)
-
-Token fixtures (Task 2+) will wire the session automatically via conftest.
+Each factory builds a model instance in memory (factory.Factory).
+Each async `create_*` function adds the instance to the session and flushes
+(gets the DB-assigned ID without committing, preserving per-test rollback).
 """
 import bcrypt
 import factory
-from factory.alchemy import AsyncSQLAlchemyModelFactory
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.account import Account
 from app.models.deposit import AllocatedBar, Deposit, TokenBalance
@@ -18,14 +16,17 @@ from app.models.vault import UnallocatedPool, Vault
 from app.models.withdrawal import Withdrawal, WithdrawalBar
 
 # Pre-hashed "password123" — computed once to avoid per-factory bcrypt overhead
-_DEFAULT_HASH = bcrypt.hashpw(b"password123", bcrypt.gensalt()).decode()
+DEFAULT_PASSWORD = "password123"
+_DEFAULT_HASH = bcrypt.hashpw(DEFAULT_PASSWORD.encode(), bcrypt.gensalt()).decode()
 
 
-class AccountFactory(AsyncSQLAlchemyModelFactory):
+# ---------------------------------------------------------------------------
+# In-memory builders (no DB interaction)
+# ---------------------------------------------------------------------------
+
+class AccountFactory(factory.Factory):
     class Meta:
         model = Account
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
     name = factory.Faker("name")
     email = factory.Sequence(lambda n: f"user{n}@example.com")
@@ -36,11 +37,9 @@ class AccountFactory(AsyncSQLAlchemyModelFactory):
     created_by = None
 
 
-class VaultFactory(AsyncSQLAlchemyModelFactory):
+class VaultFactory(factory.Factory):
     class Meta:
         model = Vault
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
     name = factory.Sequence(lambda n: f"Vault {n}")
     latitude = factory.Faker("latitude")
@@ -49,73 +48,114 @@ class VaultFactory(AsyncSQLAlchemyModelFactory):
     created_by = None
 
 
-class UnallocatedPoolFactory(AsyncSQLAlchemyModelFactory):
-    class Meta:
-        model = UnallocatedPool
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
-
-    vault_id = None  # must be set by caller
-    metal = Metal.gold
-    total_tokens = 0
-
-
-class DepositFactory(AsyncSQLAlchemyModelFactory):
+class DepositFactory(factory.Factory):
     class Meta:
         model = Deposit
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
     deposit_number = factory.Sequence(lambda n: f"DEP-{n:06d}")
-    account_id = None  # must be set by caller
-    vault_id = None    # must be set by caller
+    account_id = None
+    vault_id = None
     metal = Metal.gold
     storage_type = StorageType.unallocated
     token_amount = 10000  # 1 kg
-    created_by = None  # must be set by caller
+    created_by = None
 
 
-class AllocatedBarFactory(AsyncSQLAlchemyModelFactory):
+class AllocatedBarFactory(factory.Factory):
     class Meta:
         model = AllocatedBar
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
-    deposit_id = None  # must be set by caller
+    deposit_id = None
     serial_number = factory.Sequence(lambda n: f"BAR-{n:06d}")
     weight_g = 1000.0
 
 
-class TokenBalanceFactory(AsyncSQLAlchemyModelFactory):
+class TokenBalanceFactory(factory.Factory):
     class Meta:
         model = TokenBalance
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
-    account_id = None  # must be set by caller
+    account_id = None
     metal = Metal.gold
     balance = 0
 
 
-class WithdrawalFactory(AsyncSQLAlchemyModelFactory):
+class UnallocatedPoolFactory(factory.Factory):
+    class Meta:
+        model = UnallocatedPool
+
+    vault_id = None
+    metal = Metal.gold
+    total_tokens = 0
+
+
+class WithdrawalFactory(factory.Factory):
     class Meta:
         model = Withdrawal
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
-    account_id = None  # must be set by caller
+    account_id = None
     vault_id = None
     metal = Metal.gold
     storage_type = StorageType.unallocated
     token_amount = 1000
-    created_by = None  # must be set by caller
+    created_by = None
 
 
-class WithdrawalBarFactory(AsyncSQLAlchemyModelFactory):
+class WithdrawalBarFactory(factory.Factory):
     class Meta:
         model = WithdrawalBar
-        sqlalchemy_session = None
-        sqlalchemy_session_persistence = "commit"
 
-    withdrawal_id = None  # must be set by caller
-    bar_id = None         # must be set by caller
+    withdrawal_id = None
+    bar_id = None
+
+
+# ---------------------------------------------------------------------------
+# Async create helpers — add to session and flush (no commit)
+# ---------------------------------------------------------------------------
+
+async def create_account(session: AsyncSession, **kwargs) -> Account:
+    obj = AccountFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_vault(session: AsyncSession, **kwargs) -> Vault:
+    obj = VaultFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_deposit(session: AsyncSession, **kwargs) -> Deposit:
+    obj = DepositFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_allocated_bar(session: AsyncSession, **kwargs) -> AllocatedBar:
+    obj = AllocatedBarFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_token_balance(session: AsyncSession, **kwargs) -> TokenBalance:
+    obj = TokenBalanceFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_unallocated_pool(session: AsyncSession, **kwargs) -> UnallocatedPool:
+    obj = UnallocatedPoolFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_withdrawal(session: AsyncSession, **kwargs) -> Withdrawal:
+    obj = WithdrawalFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj

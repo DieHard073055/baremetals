@@ -8,8 +8,11 @@ from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 import app.models  # noqa: F401 — register all models with Base
+from app.auth import create_access_token
 from app.database import Base, get_db
 from app.main import app
+from app.models.enums import AccountType, Role
+from tests.factories import create_account
 
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
@@ -26,7 +29,6 @@ TestSessionLocal = async_sessionmaker(test_engine, class_=AsyncSession, expire_o
 # ---------------------------------------------------------------------------
 
 def _run(coro):
-    """Run a coroutine synchronously in a temporary event loop."""
     return asyncio.run(coro)
 
 
@@ -75,24 +77,55 @@ async def client(db_session: AsyncSession):
 
 
 # ---------------------------------------------------------------------------
-# Role token fixtures — implemented in Task 2 (Auth)
+# Role token fixtures
 # ---------------------------------------------------------------------------
 
-@pytest.fixture
-def admin_token():
-    pytest.skip("Auth not yet implemented — available after Task 2")
+@pytest_asyncio.fixture
+async def admin_account(db_session: AsyncSession) -> object:
+    return await create_account(
+        db_session, email="admin_fixture@example.com", role=Role.admin, account_type=None
+    )
+
+
+@pytest_asyncio.fixture
+async def ops_account(db_session: AsyncSession) -> object:
+    return await create_account(
+        db_session, email="ops_fixture@example.com", role=Role.ops, account_type=None
+    )
+
+
+@pytest_asyncio.fixture
+async def retail_client_account(db_session: AsyncSession) -> object:
+    return await create_account(
+        db_session, email="retail_fixture@example.com", role=Role.client, account_type=AccountType.retail
+    )
+
+
+@pytest_asyncio.fixture
+async def institutional_client_account(db_session: AsyncSession) -> object:
+    return await create_account(
+        db_session,
+        email="institutional_fixture@example.com",
+        role=Role.client,
+        account_type=AccountType.institutional,
+    )
 
 
 @pytest.fixture
-def ops_token():
-    pytest.skip("Auth not yet implemented — available after Task 2")
+def admin_token(admin_account) -> str:
+    return create_access_token({"sub": str(admin_account.id)})
 
 
 @pytest.fixture
-def retail_client_token():
-    pytest.skip("Auth not yet implemented — available after Task 2")
+def ops_token(ops_account) -> str:
+    return create_access_token({"sub": str(ops_account.id)})
 
 
 @pytest.fixture
-def institutional_client_token():
-    pytest.skip("Auth not yet implemented — available after Task 2")
+def retail_client_token(retail_client_account) -> str:
+    return create_access_token({"sub": str(retail_client_account.id)})
+
+
+@pytest.fixture
+def institutional_client_token(institutional_client_account) -> str:
+    return create_access_token({"sub": str(institutional_client_account.id)})

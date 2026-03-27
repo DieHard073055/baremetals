@@ -15,13 +15,13 @@
 - [x] 1.7 Write DB seed script to create default admin account on first boot
 
 ## 2. Auth
-- [ ] 2.1 Write tests: login success, wrong password → 401, inactive account → 401, `/auth/me` with valid/invalid token
-- [ ] 2.2 Write tests: role guard — ops on admin-only endpoint → 403, client on own vs other portfolio → 403
-- [ ] 2.3 Implement password hashing (bcrypt)
-- [ ] 2.4 Implement JWT creation and verification (HS256)
-- [ ] 2.5 `POST /auth/login` — validate credentials, return access token
-- [ ] 2.6 `GET /auth/me` — return current user profile from token
-- [ ] 2.7 Write `get_current_user` dependency with role guards (`require_admin`, `require_ops`, `require_client`)
+- [x] 2.1 Write tests: login success, wrong password → 401, inactive account → 401, `/auth/me` with valid/invalid token
+- [x] 2.2 Write tests: role guard — ops on admin-only endpoint → 403, client on own vs other portfolio → 403
+- [x] 2.3 Implement password hashing (bcrypt)
+- [x] 2.4 Implement JWT creation and verification (HS256)
+- [x] 2.5 `POST /auth/login` — validate credentials, return access token
+- [x] 2.6 `GET /auth/me` — return current user profile from token
+- [x] 2.7 Write `get_current_user` dependency with role guards (`require_admin`, `require_ops`, `require_client`)
 
 ## 3. Accounts
 - [ ] 3.1 Write tests: create retail/institutional/ops accounts, create client without account_type → 422, non-admin create → 403
