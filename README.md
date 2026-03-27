@@ -38,23 +38,23 @@ Bare Metals provides physical custody of precious metals (gold, silver, platinum
 
 **Accounts** — create and manage client and ops accounts, deactivate with holdings guard
 
-![Admin Accounts](screenshots/admin/Screenshot%202026-03-27%20at%209.23.33%20PM.png)
+![Admin Accounts](screenshots/admin/Screenshot%202026-03-27%20at%209.23.33%E2%80%AFPM.png)
 
 **Vaults** — interactive Leaflet map (dark theme, centred on Malé), click to create a vault, view inventory per vault
 
-![Admin Vaults](screenshots/admin/Screenshot%202026-03-27%20at%209.23.50%20PM.png)
+![Admin Vaults](screenshots/admin/Screenshot%202026-03-27%20at%209.23.50%E2%80%AFPM.png)
 
 **Reports** — system-wide deposit and withdrawal ledger
 
-![Admin Reports](screenshots/admin/Screenshot%202026-03-27%20at%209.24.00%20PM.png)
+![Admin Reports](screenshots/admin/Screenshot%202026-03-27%20at%209.24.00%E2%80%AFPM.png)
 
 **Prices** — current metal prices with last-fetch timestamp and stale warning
 
-![Admin Prices](screenshots/admin/Screenshot%202026-03-27%20at%209.24.10%20PM.png)
+![Admin Prices](screenshots/admin/Screenshot%202026-03-27%20at%209.24.10%E2%80%AFPM.png)
 
 **Config** — MVR/USD rate and price cache TTL
 
-![Admin Config](screenshots/admin/Screenshot%202026-03-27%20at%209.24.17%20PM.png)
+![Admin Config](screenshots/admin/Screenshot%202026-03-27%20at%209.24.17%E2%80%AFPM.png)
 
 ---
 
@@ -62,31 +62,31 @@ Bare Metals provides physical custody of precious metals (gold, silver, platinum
 
 **New Deposit** — unallocated or allocated, select vault, metal, and quantity or bars
 
-![Ops Deposit](screenshots/ops/Screenshot%202026-03-27%20at%209.25.48%20PM.png)
+![Ops Deposit](screenshots/ops/Screenshot%202026-03-27%20at%209.25.48%E2%80%AFPM.png)
 
 **New Withdrawal (allocated)** — bar selection UI for institutional clients
 
-![Ops Withdrawal](screenshots/ops/Screenshot%202026-03-27%20at%209.26.02%20PM.png)
+![Ops Withdrawal](screenshots/ops/Screenshot%202026-03-27%20at%209.26.02%E2%80%AFPM.png)
 
 **Client Portfolios — Holdings** — view any client's holdings from the ops portal
 
-![Ops Client Holdings](screenshots/ops/Screenshot%202026-03-27%20at%209.26.17%20PM.png)
+![Ops Client Holdings](screenshots/ops/Screenshot%202026-03-27%20at%209.26.17%E2%80%AFPM.png)
 
 **Client Portfolios — Deposits** — deposit history including type and amount
 
-![Ops Client Deposits](screenshots/ops/Screenshot%202026-03-27%20at%209.26.28%20PM.png)
+![Ops Client Deposits](screenshots/ops/Screenshot%202026-03-27%20at%209.26.28%E2%80%AFPM.png)
 
 **Client Portfolios — Deposits (institutional)** — allocated bar count visible
 
-![Ops Institutional Deposits](screenshots/ops/Screenshot%202026-03-27%20at%209.26.40%20PM.png)
+![Ops Institutional Deposits](screenshots/ops/Screenshot%202026-03-27%20at%209.26.40%E2%80%AFPM.png)
 
 **Vault Inventory — Unallocated** — pool balances per metal per vault
 
-![Ops Vault Unallocated](screenshots/ops/Screenshot%202026-03-27%20at%209.27.02%20PM.png)
+![Ops Vault Unallocated](screenshots/ops/Screenshot%202026-03-27%20at%209.27.02%E2%80%AFPM.png)
 
 **Vault Inventory — Allocated Bars** — individual bar serial numbers and weights
 
-![Ops Vault Bars](screenshots/ops/Screenshot%202026-03-27%20at%209.26.55%20PM.png)
+![Ops Vault Bars](screenshots/ops/Screenshot%202026-03-27%20at%209.26.55%E2%80%AFPM.png)
 
 ---
 
@@ -94,15 +94,15 @@ Bare Metals provides physical custody of precious metals (gold, silver, platinum
 
 **Portfolio — Deposits** — deposit history without internal storage type details
 
-![Institutional Deposits](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.29%20PM.png)
+![Institutional Deposits](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.29%E2%80%AFPM.png)
 
 **Portfolio — Withdrawals (MVR)** — withdrawal history with WDR reference numbers, toggled to MVR
 
-![Institutional Withdrawals MVR](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.39%20PM.png)
+![Institutional Withdrawals MVR](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.39%E2%80%AFPM.png)
 
 **Portfolio — Bars** — individually tracked bar serials and weights
 
-![Institutional Bars](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.47%20PM.png)
+![Institutional Bars](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.47%E2%80%AFPM.png)
 
 ---
 
@@ -110,11 +110,11 @@ Bare Metals provides physical custody of precious metals (gold, silver, platinum
 
 **Portfolio (USD)** — multi-metal holdings with total value, deposit history
 
-![Retail USD](screenshots/retail/Screenshot%202026-03-27%20at%209.27.44%20PM.png)
+![Retail USD](screenshots/retail/Screenshot%202026-03-27%20at%209.27.44%E2%80%AFPM.png)
 
 **Portfolio (MVR) — Withdrawals** — currency toggled to MVR, withdrawal history with WDR reference numbers
 
-![Retail MVR Withdrawals](screenshots/retail/Screenshot%202026-03-27%20at%209.27.58%20PM.png)
+![Retail MVR Withdrawals](screenshots/retail/Screenshot%202026-03-27%20at%209.27.58%E2%80%AFPM.png)
 
 ---
 
