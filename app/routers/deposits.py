@@ -4,6 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import uuid
+
 from app.database import get_db
 from app.deps import get_current_user, require_admin_or_ops, require_ops
 from app.models.account import Account
@@ -84,12 +86,6 @@ def _deposit_response(deposit: Deposit, bars: list[AllocatedBar]) -> DepositResp
     )
 
 
-_deposit_counter = 0
-
-
-def _next_deposit_number() -> str:
-    import time
-    return f"DEP-{int(time.time() * 1000) % 10**9:09d}"
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +130,6 @@ async def create_deposit(
 async def _create_unallocated_deposit(
     db: AsyncSession, body: DepositCreate, current_user: Account
 ) -> DepositResponse:
-    import uuid
     deposit_number = f"DEP-{uuid.uuid4().hex[:12].upper()}"
 
     deposit = Deposit(
@@ -185,7 +180,6 @@ async def _create_unallocated_deposit(
 async def _create_allocated_deposit(
     db: AsyncSession, body: DepositCreate, current_user: Account
 ) -> DepositResponse:
-    import uuid
     deposit_number = f"DEP-{uuid.uuid4().hex[:12].upper()}"
 
     deposit = Deposit(
