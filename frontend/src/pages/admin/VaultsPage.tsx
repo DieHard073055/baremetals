@@ -4,11 +4,21 @@ import type { Vault, VaultDetail, Metal } from '../../types'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+// Custom gold vault icon using a DivIcon — no external image needed
+const vaultIcon = L.divIcon({
+  className: '',
+  html: `<div style="
+    width:32px;height:32px;
+    background:#d97706;
+    border:2px solid #92400e;
+    border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg);
+    box-shadow:0 2px 6px rgba(0,0,0,0.5);
+    display:flex;align-items:center;justify-content:center;
+  "><span style="transform:rotate(45deg);font-size:14px;line-height:1;display:block;text-align:center;margin-top:2px;">🏛</span></div>`,
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -34],
 })
 
 const METALS: Metal[] = ['gold', 'silver', 'platinum']
@@ -26,10 +36,11 @@ function VaultMap({ vaults, onVaultClick, onMapClick }: {
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
-    const map = L.map(mapRef.current).setView([4.0, 73.5], 7)
-    // CartoDB Voyager — English labels worldwide
+    // Centre on Malé at street level
+    const map = L.map(mapRef.current).setView([4.1755, 73.5093], 12)
+    // CartoDB Dark Matter — matches navy brand theme, English labels
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      'https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png',
       {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
@@ -45,21 +56,23 @@ function VaultMap({ vaults, onVaultClick, onMapClick }: {
     if (!map) return
     markersRef.current.forEach(m => m.remove())
     markersRef.current = vaults.map(v => {
-      const marker = L.marker([v.latitude, v.longitude]).addTo(map)
+      const marker = L.marker([v.latitude, v.longitude], { icon: vaultIcon }).addTo(map)
       marker.bindPopup(`
-        <strong style="font-size:13px">${v.name}</strong><br/>
-        <span style="color:#6b7280;font-size:12px">
-          Gold: ${tokensToKg(v.gold_tokens ?? 0)} kg<br/>
-          Silver: ${tokensToKg(v.silver_tokens ?? 0)} kg<br/>
-          Platinum: ${tokensToKg(v.platinum_tokens ?? 0)} kg
-        </span>
+        <div style="font-family:system-ui,sans-serif;min-width:140px">
+          <div style="font-weight:700;font-size:13px;color:#0f172a;margin-bottom:6px">${v.name}</div>
+          <div style="font-size:11px;color:#78716c;line-height:1.8">
+            <span style="color:#d97706">◈</span> Gold &nbsp;&nbsp;${tokensToKg(v.gold_tokens ?? 0)} kg<br/>
+            <span style="color:#94a3b8">◈</span> Silver &nbsp;${tokensToKg(v.silver_tokens ?? 0)} kg<br/>
+            <span style="color:#60a5fa">◈</span> Platinum ${tokensToKg(v.platinum_tokens ?? 0)} kg
+          </div>
+        </div>
       `)
       marker.on('click', () => onVaultClick(v))
       return marker
     })
   }, [vaults])
 
-  return <div ref={mapRef} className="h-64 md:h-96 rounded-xl border border-stone-200 shadow-sm" />
+  return <div ref={mapRef} className="h-64 md:h-96 rounded-xl overflow-hidden shadow-sm" />
 }
 
 function CreateVaultModal({ lat, lng, onClose, onCreated }: {
