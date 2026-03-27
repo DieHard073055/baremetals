@@ -145,7 +145,7 @@ export function PortfolioPage() {
             <div className="table-scroll">
               <table className="w-full text-sm min-w-[360px]">
                 <thead><tr className="text-left text-xs text-stone-400 uppercase">
-                  {['Deposit #', 'Metal', 'Type', 'Amount'].map(h => <th key={h} className="pb-3 pr-4 font-semibold">{h}</th>)}
+                  {['Deposit #', 'Metal', 'Amount'].map(h => <th key={h} className="pb-3 pr-4 font-semibold">{h}</th>)}
                 </tr></thead>
                 <tbody className="divide-y divide-stone-50">
                   {deposits.length === 0
@@ -154,7 +154,6 @@ export function PortfolioPage() {
                       <tr key={d.id} className="hover:bg-stone-50">
                         <td className="py-2.5 pr-4 font-mono text-xs text-stone-400">{d.deposit_number}</td>
                         <td className="py-2.5 pr-4 capitalize text-slate-700">{d.metal}</td>
-                        <td className="py-2.5 pr-4 capitalize text-slate-600">{d.storage_type}</td>
                         <td className="py-2.5 font-medium text-slate-900">
                           {d.token_amount ? `${(d.token_amount * 0.1).toFixed(1)} g` : `${d.bars?.length ?? 0} bars`}
                         </td>
@@ -170,7 +169,7 @@ export function PortfolioPage() {
             <div className="table-scroll">
               <table className="w-full text-sm min-w-[340px]">
                 <thead><tr className="text-left text-xs text-stone-400 uppercase">
-                  {['ID', 'Metal', 'Type', 'Amount'].map(h => <th key={h} className="pb-3 pr-4 font-semibold">{h}</th>)}
+                  {['ID', 'Metal', 'Amount'].map(h => <th key={h} className="pb-3 pr-4 font-semibold">{h}</th>)}
                 </tr></thead>
                 <tbody className="divide-y divide-stone-50">
                   {withdrawals.length === 0
@@ -179,7 +178,6 @@ export function PortfolioPage() {
                       <tr key={w.id} className="hover:bg-stone-50">
                         <td className="py-2.5 pr-4 text-stone-400">{w.id}</td>
                         <td className="py-2.5 pr-4 capitalize text-slate-700">{w.metal ?? '—'}</td>
-                        <td className="py-2.5 pr-4 capitalize text-slate-600">{w.storage_type}</td>
                         <td className="py-2.5 font-medium text-slate-900">
                           {w.token_amount ? `${(w.token_amount * 0.1).toFixed(1)} g` : 'allocated bars'}
                         </td>

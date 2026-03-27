@@ -53,7 +53,7 @@ class DepositResponse(BaseModel):
     account_id: int
     vault_id: int
     metal: Metal
-    storage_type: StorageType
+    storage_type: StorageType | None = None
     token_amount: int | None
     bars: list[BarResponse] = []
 
@@ -230,12 +230,16 @@ async def list_deposits(
         query = query.where(Deposit.account_id == current_user.id)
     elif current_user.role not in (Role.admin, Role.ops):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    is_client = current_user.role == Role.client
     result = await db.execute(query)
     deposits = result.scalars().all()
     items = []
     for deposit in deposits:
         bars = await _get_bars_for_deposit(db, deposit.id)
-        items.append(_deposit_response(deposit, bars))
+        resp = _deposit_response(deposit, bars)
+        if is_client:
+            resp.storage_type = None
+        items.append(resp)
     return items
 
 

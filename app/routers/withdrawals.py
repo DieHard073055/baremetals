@@ -35,7 +35,7 @@ class WithdrawalResponse(BaseModel):
     account_id: int
     vault_id: int | None
     metal: Metal | None
-    storage_type: StorageType
+    storage_type: StorageType | None = None
     token_amount: int | None
 
     model_config = {"from_attributes": True}
@@ -204,6 +204,7 @@ async def list_withdrawals(
         query = query.where(Withdrawal.account_id == current_user.id)
     elif current_user.role not in (Role.admin, Role.ops):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    is_client = current_user.role == Role.client
     result = await db.execute(query)
     withdrawals = result.scalars().all()
     return [
@@ -212,7 +213,7 @@ async def list_withdrawals(
             account_id=w.account_id,
             vault_id=w.vault_id,
             metal=w.metal,
-            storage_type=w.storage_type,
+            storage_type=None if is_client else w.storage_type,
             token_amount=w.token_amount,
         )
         for w in withdrawals

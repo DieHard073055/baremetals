@@ -264,3 +264,24 @@ async def test_list_deposits_client_sees_own(
     data = resp.json()
     assert all(d["account_id"] == owner.id for d in data), "Client received another client's deposit"
     assert len(data) == 1
+
+
+async def test_list_deposits_client_no_storage_type(
+    client: AsyncClient, db_session: AsyncSession
+):
+    """Client responses must not include storage_type."""
+    from app.auth import create_access_token
+
+    owner = await create_account(db_session, role=Role.client, account_type=AccountType.retail)
+    vault = await create_vault(db_session)
+    await create_deposit(
+        db_session, account_id=owner.id, vault_id=vault.id,
+        storage_type=StorageType.unallocated, token_amount=100, created_by=owner.id,
+    )
+
+    token = create_access_token({"sub": str(owner.id)})
+    resp = await client.get("/deposits", headers=auth(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert "storage_type" not in data[0] or data[0]["storage_type"] is None

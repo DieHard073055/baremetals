@@ -237,3 +237,25 @@ async def test_list_withdrawals_client_sees_own(
     data = resp.json()
     assert all(w["account_id"] == owner.id for w in data), "Client received another client's withdrawal"
     assert len(data) == 1
+
+
+async def test_list_withdrawals_client_no_storage_type(
+    client: AsyncClient, db_session: AsyncSession
+):
+    """Client responses must not include storage_type."""
+    from app.auth import create_access_token
+
+    owner = await create_account(db_session, role=Role.client, account_type=AccountType.retail)
+    vault = await create_vault(db_session)
+    await create_withdrawal(
+        db_session, account_id=owner.id, vault_id=vault.id,
+        metal=Metal.gold, storage_type=StorageType.unallocated,
+        token_amount=50, created_by=owner.id,
+    )
+
+    token = create_access_token({"sub": str(owner.id)})
+    resp = await client.get("/withdrawals", headers=auth(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 1
+    assert "storage_type" not in data[0] or data[0]["storage_type"] is None
