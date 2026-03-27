@@ -33,13 +33,13 @@
 - [x] 3.7 `PATCH /accounts/{id}/deactivate` — deactivate; block if active holdings exist
 
 ## 4. Vaults
-- [ ] 4.1 Write tests: create vault success, non-admin → 403, list vaults includes metal totals, vault not found → 404
-- [ ] 4.2 Write tests: deactivate empty vault → 200, deactivate vault with active pool → 409, deactivate vault with active bars → 409
-- [ ] 4.3 Define `Vault`, `UnallocatedPool` models and schemas
-- [ ] 4.4 `POST /vaults` — create vault with lat/lng (admin only)
-- [ ] 4.5 `GET /vaults` — list all vaults with per-metal totals
-- [ ] 4.6 `GET /vaults/{id}` — vault detail + full inventory breakdown
-- [ ] 4.7 `PATCH /vaults/{id}/deactivate` — deactivate; block if active holdings exist
+- [x] 4.1 Write tests: create vault success, non-admin → 403, list vaults includes metal totals, vault not found → 404
+- [x] 4.2 Write tests: deactivate empty vault → 200, deactivate vault with active pool → 409, deactivate vault with active bars → 409
+- [x] 4.3 Define `Vault`, `UnallocatedPool` models and schemas
+- [x] 4.4 `POST /vaults` — create vault with lat/lng (admin only)
+- [x] 4.5 `GET /vaults` — list all vaults with per-metal totals
+- [x] 4.6 `GET /vaults/{id}` — vault detail + full inventory breakdown
+- [x] 4.7 `PATCH /vaults/{id}/deactivate` — deactivate; block if active holdings exist
 
 ## 5. Deposits
 - [ ] 5.1 Write tests: unallocated deposit increments pool and balance, token_amount ≤ 0 → 422, institutional on unallocated → 422
