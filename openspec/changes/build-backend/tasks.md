@@ -24,13 +24,13 @@
 - [x] 2.7 Write `get_current_user` dependency with role guards (`require_admin`, `require_ops`, `require_client`)
 
 ## 3. Accounts
-- [ ] 3.1 Write tests: create retail/institutional/ops accounts, create client without account_type → 422, non-admin create → 403
-- [ ] 3.2 Write tests: deactivate account with no holdings → 200, deactivate with active balance → 409
-- [ ] 3.3 Define `Account` SQLAlchemy model and Pydantic schemas
-- [ ] 3.4 `POST /accounts` — create account (admin only); enforce account_type rules for client role
-- [ ] 3.5 `GET /accounts` — list all accounts (admin/ops)
-- [ ] 3.6 `GET /accounts/{id}` — get account detail; unknown id → 404
-- [ ] 3.7 `PATCH /accounts/{id}/deactivate` — deactivate; block if active holdings exist
+- [x] 3.1 Write tests: create retail/institutional/ops accounts, create client without account_type → 422, non-admin create → 403
+- [x] 3.2 Write tests: deactivate account with no holdings → 200, deactivate with active balance → 409
+- [x] 3.3 Define `Account` SQLAlchemy model and Pydantic schemas
+- [x] 3.4 `POST /accounts` — create account (admin only); enforce account_type rules for client role
+- [x] 3.5 `GET /accounts` — list all accounts (admin/ops)
+- [x] 3.6 `GET /accounts/{id}` — get account detail; unknown id → 404
+- [x] 3.7 `PATCH /accounts/{id}/deactivate` — deactivate; block if active holdings exist
 
 ## 4. Vaults
 - [ ] 4.1 Write tests: create vault success, non-admin → 403, list vaults includes metal totals, vault not found → 404
