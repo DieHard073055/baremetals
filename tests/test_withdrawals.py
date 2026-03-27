@@ -197,8 +197,43 @@ async def test_list_withdrawals_admin(
     assert len(resp.json()) >= 1
 
 
-async def test_list_withdrawals_client_forbidden(
+async def test_list_withdrawals_client_sees_empty_list(
     client: AsyncClient, retail_client_token: str
 ):
+    """Client with no withdrawals gets an empty list, not a 403."""
     resp = await client.get("/withdrawals", headers=auth(retail_client_token))
-    assert resp.status_code == 403
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+# ---------------------------------------------------------------------------
+# GET /withdrawals — client can only see their own
+# ---------------------------------------------------------------------------
+
+async def test_list_withdrawals_client_sees_own(
+    client: AsyncClient, db_session: AsyncSession
+):
+    """A client token should return only that client's withdrawals, not others'."""
+    from app.auth import create_access_token
+
+    owner = await create_account(db_session, role=Role.client, account_type=AccountType.retail)
+    other = await create_account(db_session, role=Role.client, account_type=AccountType.retail)
+    vault = await create_vault(db_session)
+
+    await create_withdrawal(
+        db_session, account_id=owner.id, vault_id=vault.id,
+        metal=Metal.gold, storage_type=StorageType.unallocated,
+        token_amount=50, created_by=owner.id,
+    )
+    await create_withdrawal(
+        db_session, account_id=other.id, vault_id=vault.id,
+        metal=Metal.gold, storage_type=StorageType.unallocated,
+        token_amount=75, created_by=other.id,
+    )
+
+    token = create_access_token({"sub": str(owner.id)})
+    resp = await client.get("/withdrawals", headers=auth(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    assert all(w["account_id"] == owner.id for w in data), "Client received another client's withdrawal"
+    assert len(data) == 1

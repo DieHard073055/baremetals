@@ -4,7 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.deps import require_admin_or_ops, require_ops
+from app.deps import get_current_user, require_admin_or_ops, require_ops
+from app.models.enums import Role
 from app.models.account import Account
 from app.models.deposit import AllocatedBar, Deposit, TokenBalance
 from app.models.enums import Metal, StorageType
@@ -196,9 +197,14 @@ async def _create_allocated_withdrawal(
 @router.get("", response_model=list[WithdrawalResponse])
 async def list_withdrawals(
     db: AsyncSession = Depends(get_db),
-    _: Account = Depends(require_admin_or_ops),
+    current_user: Account = Depends(get_current_user),
 ):
-    result = await db.execute(select(Withdrawal).order_by(Withdrawal.id))
+    query = select(Withdrawal).order_by(Withdrawal.id)
+    if current_user.role == Role.client:
+        query = query.where(Withdrawal.account_id == current_user.id)
+    elif current_user.role not in (Role.admin, Role.ops):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    result = await db.execute(query)
     withdrawals = result.scalars().all()
     return [
         WithdrawalResponse(

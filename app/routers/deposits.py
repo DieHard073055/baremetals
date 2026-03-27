@@ -5,10 +5,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.deps import require_admin_or_ops, require_ops
+from app.deps import get_current_user, require_admin_or_ops, require_ops
 from app.models.account import Account
 from app.models.deposit import AllocatedBar, Deposit, TokenBalance
-from app.models.enums import AccountType, Metal, StorageType
+from app.models.enums import AccountType, Metal, Role, StorageType
 from app.models.vault import UnallocatedPool
 
 router = APIRouter(prefix="/deposits", tags=["deposits"])
@@ -223,9 +223,14 @@ async def _create_allocated_deposit(
 @router.get("", response_model=list[DepositResponse])
 async def list_deposits(
     db: AsyncSession = Depends(get_db),
-    _: Account = Depends(require_admin_or_ops),
+    current_user: Account = Depends(get_current_user),
 ):
-    result = await db.execute(select(Deposit).order_by(Deposit.id))
+    query = select(Deposit).order_by(Deposit.id)
+    if current_user.role == Role.client:
+        query = query.where(Deposit.account_id == current_user.id)
+    elif current_user.role not in (Role.admin, Role.ops):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    result = await db.execute(query)
     deposits = result.scalars().all()
     items = []
     for deposit in deposits:

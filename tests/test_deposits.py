@@ -183,11 +183,13 @@ async def test_list_deposits(
     assert len(resp.json()) >= 1
 
 
-async def test_list_deposits_client_forbidden(
+async def test_list_deposits_client_sees_empty_list(
     client: AsyncClient, retail_client_token: str
 ):
+    """Client with no deposits gets an empty list, not a 403."""
     resp = await client.get("/deposits", headers=auth(retail_client_token))
-    assert resp.status_code == 403
+    assert resp.status_code == 200
+    assert resp.json() == []
 
 
 # ---------------------------------------------------------------------------
@@ -231,3 +233,34 @@ async def test_deposit_detail_allocated_includes_bars(
 async def test_deposit_not_found(client: AsyncClient, admin_token: str):
     resp = await client.get("/deposits/999999", headers=auth(admin_token))
     assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /deposits — client can only see their own
+# ---------------------------------------------------------------------------
+
+async def test_list_deposits_client_sees_own(
+    client: AsyncClient, db_session: AsyncSession
+):
+    """A client token should return only that client's deposits, not others'."""
+    from app.auth import create_access_token
+
+    owner = await create_account(db_session, role=Role.client, account_type=AccountType.retail)
+    other = await create_account(db_session, role=Role.client, account_type=AccountType.retail)
+    vault = await create_vault(db_session)
+
+    await create_deposit(
+        db_session, account_id=owner.id, vault_id=vault.id,
+        storage_type=StorageType.unallocated, token_amount=100, created_by=owner.id,
+    )
+    await create_deposit(
+        db_session, account_id=other.id, vault_id=vault.id,
+        storage_type=StorageType.unallocated, token_amount=200, created_by=other.id,
+    )
+
+    token = create_access_token({"sub": str(owner.id)})
+    resp = await client.get("/deposits", headers=auth(token))
+    assert resp.status_code == 200
+    data = resp.json()
+    assert all(d["account_id"] == owner.id for d in data), "Client received another client's deposit"
+    assert len(data) == 1
