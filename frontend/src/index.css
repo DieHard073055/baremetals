@@ -32,3 +32,6 @@ html, body, #root {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Keep Leaflet map below fixed modals (modal z-50 = 50, Leaflet default panes are 200+) */
+.leaflet-container { z-index: 0; }
