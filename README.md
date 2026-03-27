@@ -7,6 +7,7 @@ A minimal custody platform for Bare Metals Pvt, digitizing the management of pre
 ## Table of Contents
 
 - [Overview](#overview)
+- [Screenshots](#screenshots)
 - [Architecture](#architecture)
 - [Data Model](#data-model)
 - [User Roles](#user-roles)
@@ -28,6 +29,92 @@ Bare Metals provides physical custody of precious metals (gold, silver, platinum
 - Live asset valuation via market price feed
 - Multi-currency display (USD / MVR)
 - Vault management with geographic mapping
+
+---
+
+## Screenshots
+
+### Admin
+
+**Accounts** — create and manage client and ops accounts, deactivate with holdings guard
+
+![Admin Accounts](screenshots/admin/Screenshot%202026-03-27%20at%209.23.33%20PM.png)
+
+**Vaults** — interactive Leaflet map (dark theme, centred on Malé), click to create a vault, view inventory per vault
+
+![Admin Vaults](screenshots/admin/Screenshot%202026-03-27%20at%209.23.50%20PM.png)
+
+**Reports** — system-wide deposit and withdrawal ledger
+
+![Admin Reports](screenshots/admin/Screenshot%202026-03-27%20at%209.24.00%20PM.png)
+
+**Prices** — current metal prices with last-fetch timestamp and stale warning
+
+![Admin Prices](screenshots/admin/Screenshot%202026-03-27%20at%209.24.10%20PM.png)
+
+**Config** — MVR/USD rate and price cache TTL
+
+![Admin Config](screenshots/admin/Screenshot%202026-03-27%20at%209.24.17%20PM.png)
+
+---
+
+### Ops
+
+**New Deposit** — unallocated or allocated, select vault, metal, and quantity or bars
+
+![Ops Deposit](screenshots/ops/Screenshot%202026-03-27%20at%209.25.48%20PM.png)
+
+**New Withdrawal (allocated)** — bar selection UI for institutional clients
+
+![Ops Withdrawal](screenshots/ops/Screenshot%202026-03-27%20at%209.26.02%20PM.png)
+
+**Client Portfolios — Holdings** — view any client's holdings from the ops portal
+
+![Ops Client Holdings](screenshots/ops/Screenshot%202026-03-27%20at%209.26.17%20PM.png)
+
+**Client Portfolios — Deposits** — deposit history including type and amount
+
+![Ops Client Deposits](screenshots/ops/Screenshot%202026-03-27%20at%209.26.28%20PM.png)
+
+**Client Portfolios — Deposits (institutional)** — allocated bar count visible
+
+![Ops Institutional Deposits](screenshots/ops/Screenshot%202026-03-27%20at%209.26.40%20PM.png)
+
+**Vault Inventory — Unallocated** — pool balances per metal per vault
+
+![Ops Vault Unallocated](screenshots/ops/Screenshot%202026-03-27%20at%209.27.02%20PM.png)
+
+**Vault Inventory — Allocated Bars** — individual bar serial numbers and weights
+
+![Ops Vault Bars](screenshots/ops/Screenshot%202026-03-27%20at%209.26.55%20PM.png)
+
+---
+
+### Institutional Client
+
+**Portfolio — Deposits** — deposit history without internal storage type details
+
+![Institutional Deposits](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.29%20PM.png)
+
+**Portfolio — Withdrawals (MVR)** — withdrawal history with WDR reference numbers, toggled to MVR
+
+![Institutional Withdrawals MVR](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.39%20PM.png)
+
+**Portfolio — Bars** — individually tracked bar serials and weights
+
+![Institutional Bars](screenshots/institutional/Screenshot%202026-03-27%20at%209.39.47%20PM.png)
+
+---
+
+### Retail Client
+
+**Portfolio (USD)** — multi-metal holdings with total value, deposit history
+
+![Retail USD](screenshots/retail/Screenshot%202026-03-27%20at%209.27.44%20PM.png)
+
+**Portfolio (MVR) — Withdrawals** — currency toggled to MVR, withdrawal history with WDR reference numbers
+
+![Retail MVR Withdrawals](screenshots/retail/Screenshot%202026-03-27%20at%209.27.58%20PM.png)
 
 ---
 
@@ -108,7 +195,8 @@ token_balances
   balance            INTEGER  -- maintained cache, always >= 0
 
 withdrawals
-  id, account_id, vault_id, metal
+  id, withdrawal_number (unique, e.g. WDR-FD73DA9B7274)
+  account_id, vault_id, metal
   storage_type, token_amount (retail only)
   created_by (ops user), created_at
 
