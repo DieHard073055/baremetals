@@ -94,6 +94,7 @@ def upgrade() -> None:
     )
     op.create_table('withdrawals',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('withdrawal_number', sa.String(length=50), nullable=False),
     sa.Column('account_id', sa.Integer(), nullable=False),
     sa.Column('vault_id', sa.Integer(), nullable=True),
     sa.Column('metal', sa.Enum('gold', 'silver', 'platinum', name='metal_enum'), nullable=True),
@@ -104,7 +105,8 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['account_id'], ['accounts.id'], ),
     sa.ForeignKeyConstraint(['created_by'], ['accounts.id'], ),
     sa.ForeignKeyConstraint(['vault_id'], ['vaults.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('withdrawal_number')
     )
     op.create_table('allocated_bars',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
