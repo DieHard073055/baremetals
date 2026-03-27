@@ -58,10 +58,11 @@ export interface Deposit {
 
 export interface Withdrawal {
   id: number
+  withdrawal_number: string
   account_id: number
   vault_id: number | null
   metal: Metal | null
-  storage_type: StorageType
+  storage_type: StorageType | null
   token_amount: number | null
   created_at?: string
 }

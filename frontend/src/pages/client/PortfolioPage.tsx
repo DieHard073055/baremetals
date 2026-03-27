@@ -169,14 +169,14 @@ export function PortfolioPage() {
             <div className="table-scroll">
               <table className="w-full text-sm min-w-[340px]">
                 <thead><tr className="text-left text-xs text-stone-400 uppercase">
-                  {['ID', 'Metal', 'Amount'].map(h => <th key={h} className="pb-3 pr-4 font-semibold">{h}</th>)}
+                  {['Withdrawal #', 'Metal', 'Amount'].map(h => <th key={h} className="pb-3 pr-4 font-semibold">{h}</th>)}
                 </tr></thead>
                 <tbody className="divide-y divide-stone-50">
                   {withdrawals.length === 0
                     ? <tr><td colSpan={4} className="text-center py-8 text-stone-400 text-xs">No withdrawals yet</td></tr>
                     : withdrawals.map(w => (
                       <tr key={w.id} className="hover:bg-stone-50">
-                        <td className="py-2.5 pr-4 text-stone-400">{w.id}</td>
+                        <td className="py-2.5 pr-4 font-mono text-xs text-stone-400">{w.withdrawal_number}</td>
                         <td className="py-2.5 pr-4 capitalize text-slate-700">{w.metal ?? '—'}</td>
                         <td className="py-2.5 font-medium text-slate-900">
                           {w.token_amount ? `${(w.token_amount * 0.1).toFixed(1)} g` : 'allocated bars'}

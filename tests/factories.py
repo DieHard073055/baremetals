@@ -93,6 +93,7 @@ class WithdrawalFactory(factory.Factory):
     class Meta:
         model = Withdrawal
 
+    withdrawal_number = factory.Sequence(lambda n: f"WDR-{n:012d}")
     account_id = None
     vault_id = None
     metal = Metal.gold

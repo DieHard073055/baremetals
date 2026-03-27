@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -32,6 +34,7 @@ class WithdrawalCreate(BaseModel):
 
 class WithdrawalResponse(BaseModel):
     id: int
+    withdrawal_number: str
     account_id: int
     vault_id: int | None
     metal: Metal | None
@@ -102,6 +105,7 @@ async def _create_unallocated_withdrawal(
     await db.flush()
 
     withdrawal = Withdrawal(
+        withdrawal_number=f"WDR-{uuid.uuid4().hex[:12].upper()}",
         account_id=body.account_id,
         vault_id=body.vault_id,
         metal=body.metal,
@@ -114,6 +118,7 @@ async def _create_unallocated_withdrawal(
 
     return WithdrawalResponse(
         id=withdrawal.id,
+        withdrawal_number=withdrawal.withdrawal_number,
         account_id=withdrawal.account_id,
         vault_id=withdrawal.vault_id,
         metal=withdrawal.metal,
@@ -170,6 +175,7 @@ async def _create_allocated_withdrawal(
             )
 
     withdrawal = Withdrawal(
+        withdrawal_number=f"WDR-{uuid.uuid4().hex[:12].upper()}",
         account_id=body.account_id,
         vault_id=None,
         metal=None,
@@ -186,6 +192,7 @@ async def _create_allocated_withdrawal(
 
     return WithdrawalResponse(
         id=withdrawal.id,
+        withdrawal_number=withdrawal.withdrawal_number,
         account_id=withdrawal.account_id,
         vault_id=withdrawal.vault_id,
         metal=withdrawal.metal,
@@ -210,6 +217,7 @@ async def list_withdrawals(
     return [
         WithdrawalResponse(
             id=w.id,
+            withdrawal_number=w.withdrawal_number,
             account_id=w.account_id,
             vault_id=w.vault_id,
             metal=w.metal,

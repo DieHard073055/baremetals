@@ -183,14 +183,14 @@ export function ClientsPage() {
                     <div className="table-scroll">
                       <table className="w-full text-sm min-w-[360px]">
                         <thead><tr className="text-left text-xs text-stone-400 uppercase">
-                          {['ID', 'Metal', 'Type', 'Amount'].map(h => <th key={h} className="pb-2 pr-4">{h}</th>)}
+                          {['Withdrawal #', 'Metal', 'Type', 'Amount'].map(h => <th key={h} className="pb-2 pr-4">{h}</th>)}
                         </tr></thead>
                         <tbody className="divide-y divide-stone-50">
                           {withdrawals.length === 0
                             ? <tr><td colSpan={4} className="text-center py-6 text-stone-400 text-xs">No withdrawals</td></tr>
                             : withdrawals.map(w => (
                               <tr key={w.id}>
-                                <td className="py-2 pr-4 text-stone-400">{w.id}</td>
+                                <td className="py-2 pr-4 font-mono text-xs text-stone-400">{w.withdrawal_number}</td>
                                 <td className="py-2 pr-4 capitalize text-slate-700">{w.metal ?? '—'}</td>
                                 <td className="py-2 pr-4 capitalize text-slate-600">{w.storage_type}</td>
                                 <td className="py-2 text-slate-700">
