@@ -92,7 +92,7 @@ export function PortfolioPage() {
           No holdings yet
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={`grid gap-4 ${portfolio.holdings.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
           {portfolio.holdings.map(h => {
             const cfg = METAL_CONFIG[h.metal] ?? METAL_CONFIG.gold
             return (
