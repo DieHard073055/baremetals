@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.account import Account
 from app.models.deposit import AllocatedBar, Deposit, TokenBalance
 from app.models.enums import AccountType, Metal, Role, StorageType
+from app.models.metal_price import MetalPrice
 from app.models.vault import UnallocatedPool, Vault
 from app.models.withdrawal import Withdrawal, WithdrawalBar
 
@@ -156,6 +157,24 @@ async def create_unallocated_pool(session: AsyncSession, **kwargs) -> Unallocate
 
 async def create_withdrawal(session: AsyncSession, **kwargs) -> Withdrawal:
     obj = WithdrawalFactory.build(**kwargs)
+    session.add(obj)
+    await session.flush()
+    return obj
+
+
+async def create_metal_price(
+    session: AsyncSession,
+    metal: Metal = Metal.gold,
+    price_usd_per_troy_oz: float = 1960.0,
+    **kwargs,
+) -> MetalPrice:
+    from datetime import datetime, timezone
+    obj = MetalPrice(
+        metal=metal,
+        price_usd_per_troy_oz=price_usd_per_troy_oz,
+        fetched_at=kwargs.get("fetched_at", datetime.now(timezone.utc)),
+        raw_response=kwargs.get("raw_response"),
+    )
     session.add(obj)
     await session.flush()
     return obj

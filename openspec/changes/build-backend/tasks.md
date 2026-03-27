@@ -64,27 +64,27 @@
 - [x] 6.8 `GET /withdrawals` — list all withdrawals (admin/ops)
 
 ## 7. Portfolio
-- [ ] 7.1 Write tests: retail portfolio returns token balance in kg, institutional returns active bar list
-- [ ] 7.2 Write tests: valuations correct in USD and MVR, stale flag propagated, no-cache → holdings returned without values
-- [ ] 7.3 Write tests: client accessing own portfolio → 200, client accessing other → 403
-- [ ] 7.4 Aggregate retail holdings from `token_balances` per metal
-- [ ] 7.5 Aggregate institutional holdings from active `allocated_bars` per metal
-- [ ] 7.6 Fetch current price from `metal_prices` cache; attach `stale` flag if TTL exceeded or API unreachable
-- [ ] 7.7 Compute USD and MVR valuations using price and `system_config.mvr_usd_rate`
-- [ ] 7.8 `GET /portfolio/{account_id}` — return holdings + valuations (client: own only; ops/admin: any)
+- [x] 7.1 Write tests: retail portfolio returns token balance in kg, institutional returns active bar list
+- [x] 7.2 Write tests: valuations correct in USD and MVR, stale flag propagated, no-cache → holdings returned without values
+- [x] 7.3 Write tests: client accessing own portfolio → 200, client accessing other → 403
+- [x] 7.4 Aggregate retail holdings from `token_balances` per metal
+- [x] 7.5 Aggregate institutional holdings from active `allocated_bars` per metal
+- [x] 7.6 Fetch current price from `metal_prices` cache; attach `stale` flag if TTL exceeded or API unreachable
+- [x] 7.7 Compute USD and MVR valuations using price and `system_config.mvr_usd_rate`
+- [x] 7.8 `GET /portfolio/{account_id}` — return holdings + valuations (client: own only; ops/admin: any)
 
 ## 8. Metal Prices
-- [ ] 8.1 Write tests: price within TTL served from cache (no external call), cache expired triggers fetch and persist
-- [ ] 8.2 Write tests: API unreachable with cache → stale: true, API unreachable no cache → 503
-- [ ] 8.3 Write tests: force refresh updates cache, non-admin force refresh → 403
-- [ ] 8.4 Write metalpriceapi.com HTTP client (fetch gold, silver, platinum in USD/troy oz) — mock in tests
-- [ ] 8.5 Implement price cache logic: serve DB cache if within TTL, else fetch and persist
-- [ ] 8.6 On fetch failure: return last cached price with `stale: true`; if no cache exists, return HTTP 503
-- [ ] 8.7 `GET /prices` — return cached prices with stale flag and last fetch time
-- [ ] 8.8 `POST /prices/refresh` — force immediate refresh (admin only)
+- [x] 8.1 Write tests: price within TTL served from cache (no external call), cache expired triggers fetch and persist
+- [x] 8.2 Write tests: API unreachable with cache → stale: true, API unreachable no cache → 503
+- [x] 8.3 Write tests: force refresh updates cache, non-admin force refresh → 403
+- [x] 8.4 Write metalpriceapi.com HTTP client (fetch gold, silver, platinum in USD/troy oz) — mock in tests
+- [x] 8.5 Implement price cache logic: serve DB cache if within TTL, else fetch and persist
+- [x] 8.6 On fetch failure: return last cached price with `stale: true`; if no cache exists, return HTTP 503
+- [x] 8.7 `GET /prices` — return cached prices with stale flag and last fetch time
+- [x] 8.8 `POST /prices/refresh` — force immediate refresh (admin only)
 
 ## 9. System Config
-- [ ] 9.1 Write tests: config seeded with defaults on first boot, read config → 200, update MVR rate → reflected in subsequent reads, non-admin update → 403
-- [ ] 9.2 Define `SystemConfig` model with `key`/`value` pairs and seed defaults (`mvr_usd_rate=15.42`, `price_cache_ttl_hours=24`)
-- [ ] 9.3 `GET /config` — return all config key/value pairs
-- [ ] 9.4 `PATCH /config` — update `mvr_usd_rate` and/or `price_cache_ttl_hours` (admin only)
+- [x] 9.1 Write tests: config seeded with defaults on first boot, read config → 200, update MVR rate → reflected in subsequent reads, non-admin update → 403
+- [x] 9.2 Define `SystemConfig` model with `key`/`value` pairs and seed defaults (`mvr_usd_rate=15.42`, `price_cache_ttl_hours=24`)
+- [x] 9.3 `GET /config` — return all config key/value pairs
+- [x] 9.4 `PATCH /config` — update `mvr_usd_rate` and/or `price_cache_ttl_hours` (admin only)
