@@ -1,11 +1,34 @@
 @import "tailwindcss";
 
+:root {
+  /* Bare Metals brand palette */
+  --bm-navy: #0f172a;      /* slate-900  — header, dark surfaces */
+  --bm-gold: #d97706;      /* amber-600  — primary accent */
+  --bm-gold-light: #fbbf24;/* amber-400  — hover, active nav */
+  --bm-warm: #fafaf9;      /* stone-50   — page background */
+  --bm-surface: #ffffff;
+  --bm-border: #e7e5e4;    /* stone-200 */
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  background-color: var(--bm-warm);
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* Prevent horizontal overflow globally */
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Scrollable table wrapper utility */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }

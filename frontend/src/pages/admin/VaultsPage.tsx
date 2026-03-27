@@ -4,7 +4,6 @@ import type { Vault, VaultDetail, Metal } from '../../types'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// Fix leaflet's default icon path issue with Vite
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -14,9 +13,7 @@ L.Icon.Default.mergeOptions({
 
 const METALS: Metal[] = ['gold', 'silver', 'platinum']
 
-function tokensToKg(tokens: number) {
-  return (tokens * 0.1 / 1000).toFixed(3)
-}
+function tokensToKg(tokens: number) { return (tokens * 0.1 / 1000).toFixed(3) }
 
 function VaultMap({ vaults, onVaultClick, onMapClick }: {
   vaults: Vault[]
@@ -30,9 +27,15 @@ function VaultMap({ vaults, onVaultClick, onMapClick }: {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
     const map = L.map(mapRef.current).setView([4.0, 73.5], 7)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(map)
+    // CartoDB Voyager — English labels worldwide
+    L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }
+    ).addTo(map)
     map.on('click', (e) => onMapClick(e.latlng.lat, e.latlng.lng))
     mapInstanceRef.current = map
   }, [])
@@ -44,17 +47,19 @@ function VaultMap({ vaults, onVaultClick, onMapClick }: {
     markersRef.current = vaults.map(v => {
       const marker = L.marker([v.latitude, v.longitude]).addTo(map)
       marker.bindPopup(`
-        <b>${v.name}</b><br/>
-        Gold: ${tokensToKg(v.gold_tokens ?? 0)} kg<br/>
-        Silver: ${tokensToKg(v.silver_tokens ?? 0)} kg<br/>
-        Platinum: ${tokensToKg(v.platinum_tokens ?? 0)} kg
+        <strong style="font-size:13px">${v.name}</strong><br/>
+        <span style="color:#6b7280;font-size:12px">
+          Gold: ${tokensToKg(v.gold_tokens ?? 0)} kg<br/>
+          Silver: ${tokensToKg(v.silver_tokens ?? 0)} kg<br/>
+          Platinum: ${tokensToKg(v.platinum_tokens ?? 0)} kg
+        </span>
       `)
       marker.on('click', () => onVaultClick(v))
       return marker
     })
   }, [vaults])
 
-  return <div ref={mapRef} className="h-96 rounded-xl border border-gray-200" />
+  return <div ref={mapRef} className="h-64 md:h-96 rounded-xl border border-stone-200 shadow-sm" />
 }
 
 function CreateVaultModal({ lat, lng, onClose, onCreated }: {
@@ -73,25 +78,33 @@ function CreateVaultModal({ lat, lng, onClose, onCreated }: {
       onClose()
     } catch (err: any) {
       setError(err.response?.data?.detail ?? 'Failed to create vault')
-    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
-        <h2 className="text-lg font-semibold mb-1">New Vault</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          {lat.toFixed(4)}, {lng.toFixed(4)}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-slate-900">New Vault</h2>
+          <button onClick={onClose} className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+        </div>
+        <p className="text-xs text-stone-400 mb-4 font-mono">
+          {lat.toFixed(5)}, {lng.toFixed(5)}
         </p>
         <form onSubmit={submit} className="space-y-3">
-          <input required placeholder="Vault name" value={name} onChange={e => setName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm" />
+          <input required placeholder="Vault name" value={name}
+            onChange={e => setName(e.target.value)}
+            className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 border rounded-lg py-2 text-sm">Cancel</button>
-            <button type="submit" disabled={loading} className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm">
+            <button type="button" onClick={onClose}
+              className="flex-1 border border-stone-200 rounded-lg py-2.5 text-sm text-slate-700 hover:bg-stone-50">
+              Cancel
+            </button>
+            <button type="submit" disabled={loading}
+              className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+              style={{ backgroundColor: 'var(--bm-gold)' }}>
               {loading ? 'Creating…' : 'Create'}
             </button>
           </div>
@@ -134,34 +147,36 @@ export function VaultsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-gray-900">Vaults</h1>
-      <p className="text-sm text-gray-500 -mt-4">Click on the map to create a new vault.</p>
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-xl font-bold text-slate-900">Vaults</h1>
+        <p className="text-sm text-slate-500">Click on the map to add a new vault location.</p>
+      </div>
 
-      <VaultMap
-        vaults={vaults}
-        onVaultClick={loadDetail}
-        onMapClick={(lat, lng) => setPending({ lat, lng })}
-      />
+      <VaultMap vaults={vaults} onVaultClick={loadDetail} onMapClick={(lat, lng) => setPending({ lat, lng })} />
 
-      {/* Vault list */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Vault cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {vaults.map(v => (
           <div key={v.id}
             onClick={() => loadDetail(v)}
-            className="bg-white rounded-xl border border-gray-200 p-4 cursor-pointer hover:border-blue-300 transition-colors"
+            className="bg-white rounded-xl border border-stone-200 p-4 cursor-pointer hover:border-amber-300 hover:shadow-md transition-all shadow-sm"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-gray-900">{v.name}</span>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${v.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+            <div className="flex items-start justify-between mb-3">
+              <span className="font-semibold text-slate-900">{v.name}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ml-2 ${
+                v.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-500'
+              }`}>
                 {v.is_active ? 'Active' : 'Inactive'}
               </span>
             </div>
-            <div className="text-xs text-gray-500 space-y-0.5">
+            <div className="space-y-1">
               {METALS.map(m => (
-                <div key={m} className="flex justify-between capitalize">
+                <div key={m} className="flex justify-between text-xs text-slate-500 capitalize">
                   <span>{m}</span>
-                  <span>{tokensToKg((v as any)[`${m}_tokens`] ?? 0)} kg</span>
+                  <span className="font-medium text-slate-700">
+                    {tokensToKg((v as any)[`${m}_tokens`] ?? 0)} kg
+                  </span>
                 </div>
               ))}
             </div>
@@ -169,7 +184,7 @@ export function VaultsPage() {
               <button
                 onClick={(e) => { e.stopPropagation(); deactivate(v.id) }}
                 disabled={deactivating === v.id}
-                className="mt-3 text-xs text-red-500 hover:text-red-700"
+                className="mt-3 text-xs text-red-500 hover:text-red-700 disabled:opacity-40"
               >
                 Deactivate
               </button>
@@ -180,33 +195,44 @@ export function VaultsPage() {
 
       {/* Detail panel */}
       {selected && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">{selected.name} — Inventory</h2>
-            <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
-          </div>
-          <div className="grid grid-cols-2 gap-6">
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Unallocated Pools</h3>
+              <h2 className="text-base font-bold text-slate-900">{selected.name}</h2>
+              <p className="text-xs text-stone-400">Vault #{selected.id}</p>
+            </div>
+            <button onClick={() => setSelected(null)}
+              className="text-stone-400 hover:text-stone-600 text-xl">✕</button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <h3 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">
+                Unallocated Pools
+              </h3>
               {selected.pools.length === 0
-                ? <p className="text-sm text-gray-400">No pools</p>
+                ? <p className="text-sm text-stone-400">No pools</p>
                 : selected.pools.map(p => (
-                  <div key={p.metal} className="flex justify-between text-sm py-1 border-b border-gray-100 capitalize">
-                    <span>{p.metal}</span>
-                    <span>{tokensToKg(p.total_tokens)} kg</span>
+                  <div key={p.metal}
+                    className="flex justify-between text-sm py-2 border-b border-stone-100 capitalize">
+                    <span className="text-slate-700">{p.metal}</span>
+                    <span className="font-medium text-slate-900">{tokensToKg(p.total_tokens)} kg</span>
                   </div>
                 ))
               }
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Allocated Bars ({selected.bars.length})</h3>
+              <h3 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-2">
+                Active Bars ({selected.bars.length})
+              </h3>
               <div className="max-h-48 overflow-y-auto space-y-1">
                 {selected.bars.length === 0
-                  ? <p className="text-sm text-gray-400">No active bars</p>
+                  ? <p className="text-sm text-stone-400">No active bars</p>
                   : selected.bars.map(b => (
-                    <div key={b.id} className="text-xs text-gray-600 flex justify-between py-1 border-b border-gray-50">
-                      <span className="capitalize">[{b.metal}] {b.serial_number}</span>
-                      <span>{b.weight_g}g</span>
+                    <div key={b.id}
+                      className="flex justify-between text-xs py-1.5 border-b border-stone-50">
+                      <span className="text-stone-500 capitalize mr-2">[{b.metal}]</span>
+                      <span className="font-mono text-slate-700 flex-1">{b.serial_number}</span>
+                      <span className="text-stone-400 ml-2">{b.weight_g}g</span>
                     </div>
                   ))
                 }
@@ -218,8 +244,7 @@ export function VaultsPage() {
 
       {pending && (
         <CreateVaultModal
-          lat={pending.lat}
-          lng={pending.lng}
+          lat={pending.lat} lng={pending.lng}
           onClose={() => setPending(null)}
           onCreated={() => { load(); setPending(null) }}
         />

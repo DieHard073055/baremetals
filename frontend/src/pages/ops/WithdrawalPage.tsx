@@ -3,6 +3,7 @@ import { api } from '../../lib/api'
 import type { Account, Vault, Metal, Portfolio, BarSummary } from '../../types'
 
 const METALS: Metal[] = ['gold', 'silver', 'platinum']
+const inputCls = 'w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400'
 
 export function WithdrawalPage() {
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -49,13 +50,10 @@ export function WithdrawalPage() {
     setSuccess('')
     setLoading(true)
     try {
-      const body: Record<string, any> = {
-        account_id: Number(accountId),
-        storage_type: storageType,
-      }
+      const body: Record<string, any> = { account_id: Number(accountId), storage_type: storageType }
       if (storageType === 'unallocated') {
         const tokens = Math.round(parseFloat(grams) * 10)
-        if (tokens <= 0) { setError('Grams must be positive'); setLoading(false); return }
+        if (tokens <= 0) { setError('Weight must be positive'); setLoading(false); return }
         body.vault_id = Number(vaultId)
         body.metal = metal
         body.token_amount = tokens
@@ -67,10 +65,7 @@ export function WithdrawalPage() {
       setSuccess('Withdrawal recorded successfully.')
       setGrams('')
       setSelectedBarIds(new Set())
-      // Reload portfolio
-      if (accountId) {
-        api.get<Portfolio>(`/portfolio/${accountId}`).then(r => setPortfolio(r.data)).catch(() => {})
-      }
+      if (accountId) api.get<Portfolio>(`/portfolio/${accountId}`).then(r => setPortfolio(r.data)).catch(() => {})
     } catch (err: any) {
       setError(err.response?.data?.detail ?? 'Failed to create withdrawal')
     } finally {
@@ -79,84 +74,97 @@ export function WithdrawalPage() {
   }
 
   return (
-    <div className="max-w-lg">
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">New Withdrawal</h1>
+    <div>
+      <div className="mb-5">
+        <h1 className="text-xl font-bold text-slate-900">New Withdrawal</h1>
+        <p className="text-sm text-slate-500">Process a client metal withdrawal from a vault</p>
+      </div>
 
-      <form onSubmit={submit} className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Client Account</label>
-          <select required value={accountId} onChange={e => setAccountId(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm">
-            <option value="">Select client…</option>
-            {accounts.map(a => (
-              <option key={a.id} value={a.id}>{a.name} ({a.account_type})</option>
-            ))}
-          </select>
-        </div>
-
-        {accountId && (
-          <div className="text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-lg">
-            Storage type: <strong className="capitalize">{storageType}</strong>
-          </div>
-        )}
-
-        {storageType === 'unallocated' && accountId && (
-          <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Vault</label>
-              <select required value={vaultId} onChange={e => setVaultId(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm">
-                <option value="">Select vault…</option>
-                {vaults.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Metal</label>
-              <select value={metal} onChange={e => setMetal(e.target.value as Metal)}
-                className="w-full border rounded-lg px-3 py-2 text-sm">
-                {METALS.map(m => <option key={m} value={m} className="capitalize">{m}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Weight (grams)</label>
-              <input type="number" step="0.1" min="0.1" value={grams}
-                onChange={e => setGrams(e.target.value)} placeholder="e.g. 50.0"
-                className="w-full border rounded-lg px-3 py-2 text-sm" />
-            </div>
-          </>
-        )}
-
-        {storageType === 'allocated' && accountId && (
+      <div className="max-w-lg">
+        <form onSubmit={submit} className="bg-white rounded-xl border border-stone-200 shadow-sm p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Bars to Withdraw ({selectedBarIds.size} selected)
-            </label>
-            {activeBars.length === 0
-              ? <p className="text-sm text-gray-400">No active bars for this account</p>
-              : (
-                <div className="max-h-48 overflow-y-auto border rounded-lg divide-y">
-                  {activeBars.map(b => (
-                    <label key={b.id} className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50">
-                      <input type="checkbox" checked={selectedBarIds.has(b.id)}
-                        onChange={() => toggleBar(b.id)} className="rounded" />
-                      <span className="text-sm text-gray-700">{b.serial_number}</span>
-                      <span className="text-xs text-gray-400 ml-auto">{b.weight_g}g</span>
-                    </label>
-                  ))}
-                </div>
-              )
-            }
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Client Account</label>
+            <select required value={accountId} onChange={e => setAccountId(e.target.value)} className={inputCls}>
+              <option value="">Select client…</option>
+              {accounts.map(a => (
+                <option key={a.id} value={a.id}>{a.name} · {a.account_type}</option>
+              ))}
+            </select>
           </div>
-        )}
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {success && <p className="text-sm text-green-600">{success}</p>}
+          {accountId && (
+            <div className={`flex items-center gap-2 text-xs px-3 py-2 rounded-lg border ${
+              storageType === 'allocated'
+                ? 'bg-blue-50 border-blue-200 text-blue-700'
+                : 'bg-amber-50 border-amber-200 text-amber-700'
+            }`}>
+              <span>{storageType === 'allocated' ? '📦' : '🪙'}</span>
+              <span>Storage type: <strong className="capitalize">{storageType}</strong></span>
+            </div>
+          )}
 
-        <button type="submit" disabled={loading || !accountId}
-          className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-60">
-          {loading ? 'Submitting…' : 'Submit Withdrawal'}
-        </button>
-      </form>
+          {storageType === 'unallocated' && accountId && (
+            <>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Vault</label>
+                <select required value={vaultId} onChange={e => setVaultId(e.target.value)} className={inputCls}>
+                  <option value="">Select vault…</option>
+                  {vaults.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Metal</label>
+                <select value={metal} onChange={e => setMetal(e.target.value as Metal)} className={inputCls}>
+                  {METALS.map(m => <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Weight (grams)</label>
+                <input type="number" step="0.1" min="0.1" value={grams}
+                  onChange={e => setGrams(e.target.value)} placeholder="e.g. 50.0" className={inputCls} />
+                {grams && parseFloat(grams) > 0 && (
+                  <p className="text-xs text-stone-400 mt-1.5">= {Math.round(parseFloat(grams) * 10)} tokens</p>
+                )}
+              </div>
+            </>
+          )}
+
+          {storageType === 'allocated' && accountId && (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Select Bars ({selectedBarIds.size} selected)
+              </label>
+              {activeBars.length === 0
+                ? <p className="text-sm text-stone-400 py-4 text-center border border-stone-200 rounded-lg">
+                    No active bars for this account
+                  </p>
+                : (
+                  <div className="max-h-52 overflow-y-auto border border-stone-200 rounded-lg divide-y divide-stone-100">
+                    {activeBars.map(b => (
+                      <label key={b.id} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-stone-50">
+                        <input type="checkbox" checked={selectedBarIds.has(b.id)}
+                          onChange={() => toggleBar(b.id)}
+                          className="rounded accent-amber-500" />
+                        <span className="text-sm font-mono text-slate-700 flex-1">{b.serial_number}</span>
+                        <span className="text-xs text-stone-400">{b.weight_g}g</span>
+                      </label>
+                    ))}
+                  </div>
+                )
+              }
+            </div>
+          )}
+
+          {error && <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-lg">{error}</div>}
+          {success && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-3 py-2 rounded-lg">✓ {success}</div>}
+
+          <button type="submit" disabled={loading || !accountId}
+            className="w-full rounded-lg py-2.5 text-sm font-semibold text-white disabled:opacity-60 transition-colors"
+            style={{ backgroundColor: 'var(--bm-gold)' }}>
+            {loading ? 'Submitting…' : 'Submit Withdrawal'}
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
