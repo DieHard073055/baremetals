@@ -337,7 +337,7 @@ That's it. The following services will start:
 
 | Service | URL |
 |---|---|
-| Frontend | http://localhost:5173 |
+| Frontend | http://localhost |
 | Backend API | http://localhost:8000 |
 | API Docs (Swagger) | http://localhost:8000/docs |
 | PostgreSQL | localhost:5432 (internal) |
